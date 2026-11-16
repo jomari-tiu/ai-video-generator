@@ -32,6 +32,17 @@ export function ImageSplit() {
   const [error, setError] = useState<string | null>(null);
   const [over, setOver] = useState(false);
   const [zipping, setZipping] = useState(false);
+  // Pictures left out of the ZIP. Tied to this image and grid, so a new image or grid starts with everything selected.
+  const [skip, setSkip] = useState<{ key: string; set: Set<number> }>({ key: "", set: new Set() });
+  const pickKey = `${img?.url}:${rows}x${cols}`;
+  const skipped = skip.key === pickKey ? skip.set : new Set<number>();
+  const chosen = tiles.filter((_, i) => !skipped.has(i));
+  const toggle = (i: number) => {
+    const next = new Set(skipped);
+    if (next.has(i)) next.delete(i);
+    else next.add(i);
+    setSkip({ key: pickKey, set: next });
+  };
 
   const choose = async (files: File[]) => {
     const f = files[0];
@@ -187,40 +198,72 @@ export function ImageSplit() {
               </label>
             </div>
 
+            <div className="split-pickbar">
+              <span>
+                <strong className="num">
+                  {chosen.length} of {tiles.length}
+                </strong>{" "}
+                selected
+              </span>
+              <button type="button" className="btn ghost" disabled={!skipped.size} onClick={() => setSkip({ key: pickKey, set: new Set() })}>
+                Select all
+              </button>
+              <button
+                type="button"
+                className="btn ghost"
+                disabled={skipped.size === tiles.length}
+                onClick={() => setSkip({ key: pickKey, set: new Set(tiles.map((_, i) => i)) })}
+              >
+                Select none
+              </button>
+            </div>
+
             <ol className="split-tiles" aria-label="Pictures" style={{ ["--cols" as string]: Math.min(cols, 5) }}>
-              {tiles.map((t, i) => (
-                <li key={t.url}>
-                  <button type="button" onClick={() => save(t.blob, t.name)} title={`Download ${t.name}`}>
-                    <img src={t.url} alt={`Picture ${i + 1}`} style={{ aspectRatio: `${t.rect.w} / ${t.rect.h}` }} />
-                    <span>
+              {tiles.map((t, i) => {
+                const on = !skipped.has(i);
+                return (
+                  <li key={t.url} className={on ? undefined : "off"}>
+                    <label className="split-pick" title={on ? "Click to leave this picture out" : "Click to include this picture"}>
+                      <input type="checkbox" checked={on} onChange={() => toggle(i)} aria-label={`Include picture ${i + 1}`} />
+                      <img src={t.url} alt={`Picture ${i + 1}`} style={{ aspectRatio: `${t.rect.w} / ${t.rect.h}` }} />
+                      {!on && <span className="split-skip">Skipped</span>}
+                    </label>
+                    <div className="split-meta">
                       <span>{i + 1}</span>
-                      <Download size={14} />
-                    </span>
-                  </button>
-                </li>
-              ))}
+                      <button type="button" className="icon-btn" onClick={() => save(t.blob, t.name)} title={`Download ${t.name} only`} aria-label={`Download picture ${i + 1} only`}>
+                        <Download size={15} />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
 
             <p className="fine left">
-              {tiles.length} pictures{first ? `, each ${first.w} × ${first.h} px` : ""}. Click a picture to download just that one.
+              {tiles.length} pictures{first ? `, each ${first.w} × ${first.h} px` : ""}. Click a picture to leave it out of the ZIP; the
+              download icon saves just that one. Files keep their grid number, so the ZIP stays in order.
               {trim ? " Shaded areas are borders that get left out." : ""}
             </p>
             <div className="welcome-actions left">
               <button
                 type="button"
                 className="btn primary lg"
-                disabled={!tiles.length || zipping}
+                disabled={!chosen.length || zipping}
                 onClick={async () => {
                   setZipping(true);
                   try {
-                    save(await makeZip(tiles), `${img.file.name.replace(/\.[^.]+$/, "")}-split.zip`);
+                    save(await makeZip(chosen), `${img.file.name.replace(/\.[^.]+$/, "")}-split.zip`);
                   } finally {
                     setZipping(false);
                   }
                 }}
               >
                 <FolderDown size={18} />
-                {zipping ? "Packing…" : `Download all ${tiles.length} (ZIP)`}
+                {zipping
+                  ? "Packing…"
+                  : chosen.length === tiles.length
+                    ? `Download all ${tiles.length} (ZIP)`
+                    : `Download ${chosen.length} selected (ZIP)`}
               </button>
             </div>
           </div>

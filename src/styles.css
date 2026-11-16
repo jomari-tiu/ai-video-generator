@@ -1172,34 +1172,87 @@ audio.subs-media {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.split-tiles button {
+.split-pickbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.split-pickbar > span {
+  margin-right: auto;
+  color: var(--ink-2);
+}
+.split-pickbar .btn {
+  height: 32px;
+}
+.split-tiles li {
   display: grid;
-  gap: 6px;
-  width: 100%;
+  gap: 4px;
   padding: 6px;
   border-radius: 10px;
-  border: 1px solid var(--hair);
-  background: var(--panel);
-  cursor: pointer;
-  transition: border-color 120ms var(--ease), background-color 120ms var(--ease);
-}
-.split-tiles button:hover {
-  border-color: var(--accent);
+  border: 1.5px solid var(--accent);
   background: var(--accent-soft);
+  transition: border-color 120ms var(--ease), background-color 120ms var(--ease), opacity 120ms var(--ease);
+}
+.split-tiles li.off {
+  border-color: var(--hair);
+  background: var(--panel);
+}
+.split-pick {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  line-height: 0;
+}
+.split-pick input {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
 }
 .split-tiles img {
   width: 100%;
   border-radius: 6px;
   object-fit: cover;
   background: var(--panel-2);
+  transition: opacity 120ms var(--ease), filter 120ms var(--ease);
 }
-.split-tiles button > span {
+.split-tiles li.off img {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+.split-pick:hover img {
+  filter: brightness(1.05);
+}
+.split-skip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--panel);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.split-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2px;
+  padding-left: 2px;
   font-weight: 600;
   color: var(--ink-2);
+}
+.split-meta .icon-btn {
+  width: 28px;
+  height: 28px;
 }
 
 /* ---------- SRT video ---------- */
