@@ -42,27 +42,6 @@ export function makeClick(sampleRate: number): Float32Array {
   return out;
 }
 
-/** The soundtrack with a click mixed in at each time, extended with silence to `duration` if needed. */
-export function withClicks(audio: AudioBuffer, times: number[], duration: number): AudioBuffer {
-  const rate = audio.sampleRate;
-  const out = new AudioBuffer({
-    length: Math.max(audio.length, Math.ceil(duration * rate)),
-    numberOfChannels: audio.numberOfChannels,
-    sampleRate: rate,
-  });
-  const click = makeClick(rate);
-  for (let ch = 0; ch < audio.numberOfChannels; ch++) {
-    const data = out.getChannelData(ch);
-    data.set(audio.getChannelData(ch));
-    for (const t of times) {
-      const at = Math.round(t * rate);
-      for (let i = 0; i < click.length && at + i < data.length; i++) {
-        data[at + i] = Math.max(-1, Math.min(1, data[at + i] + click[i]));
-      }
-    }
-  }
-  return out;
-}
 
 /**
  * One image per cue (by `assign`), held until the next cue with a different image.
@@ -176,9 +155,8 @@ export interface RenderJob {
   cues: Cue[];
   segs: Segment[];
   images: ImageBitmap[];
+  /** The soundtrack, written as-is. The image-change click is a preview aid and is never put in the file. */
   audio: AudioBuffer;
-  /** Mix a click in whenever a new image starts. */
-  clickOnChange: boolean;
   duration: number;
   onProgress: (fraction: number) => void;
   signal: AbortSignal;
@@ -207,8 +185,7 @@ export async function renderVideo(job: RenderJob): Promise<Blob> {
   await output.start();
 
   try {
-    // The first image is there from the start, so only later changes click.
-    await audio.add(job.clickOnChange ? withClicks(job.audio, job.segs.slice(1).map((s) => s.start), duration) : job.audio);
+    await audio.add(job.audio);
     const frames = Math.ceil(duration * fps);
     for (let i = 0; i < frames; i++) {
       if (job.signal.aborted) throw new DOMException("Cancelled", "AbortError");

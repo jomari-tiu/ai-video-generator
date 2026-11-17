@@ -221,7 +221,6 @@ export function SrtVideo() {
         images: bitmaps,
         audio: audio.buffer,
         duration,
-        clickOnChange: click,
         signal: ctrl.signal,
         onProgress: (pct) => setRender({ step: "rendering", pct }),
       });
@@ -315,7 +314,7 @@ export function SrtVideo() {
                 {option(captions, setCaptions, "Burn in subtitles", "Draw each subtitle line on the video, bottom centre.")}
                 {option(zoom, setZoom, "Apply animated zoom", "Zoom each image between 100% and 105%.")}
                 {option(fade, setFade, "Crossfade between images", "Blend into the next image over half a second.")}
-                {option(click, setClick, "Play image-change sound", "Play a short click sound whenever a new image starts.")}
+                {option(click, setClick, "Play image-change sound", "Click in the preview whenever a new image starts. Never added to the downloaded video.")}
               </div>
 
           {ready && (
