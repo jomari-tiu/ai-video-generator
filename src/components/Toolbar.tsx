@@ -114,9 +114,9 @@ export function Toolbar({ onSignature }: { onSignature: () => void }) {
             <FilePlus2 size={18} />
           </button>
         </div>
-        <button type="button" className="btn primary" onClick={save} disabled={saving}>
+        <button type="button" className="btn primary" onClick={save} disabled={saving} aria-label="Download the edited PDF" title="Download the edited PDF">
           <Download size={17} />
-          {saving ? "Saving…" : "Download"}
+          <span className="btn-label">{saving ? "Saving…" : "Download"}</span>
         </button>
       </div>
     </header>

@@ -29,8 +29,11 @@ async function loadBitmap(f: File) {
   const bmp = await createImageBitmap(f);
   const k = 2160 / Math.max(bmp.width, bmp.height);
   if (k >= 1) return bmp;
+  // Read the size before closing: a closed bitmap reports 0 × 0.
+  const resizeWidth = Math.max(1, Math.round(bmp.width * k));
+  const resizeHeight = Math.max(1, Math.round(bmp.height * k));
   bmp.close();
-  return createImageBitmap(f, { resizeWidth: Math.round(bmp.width * k), resizeHeight: Math.round(bmp.height * k), resizeQuality: "high" });
+  return createImageBitmap(f, { resizeWidth, resizeHeight, resizeQuality: "high" });
 }
 const isAudio = (f: File) => /^(audio|video)\//.test(f.type) || /\.(mp3|m4a|wav|ogg|aac|mp4)$/i.test(f.name);
 const mmss = (s: number) => timecode(s).slice(3, 8);

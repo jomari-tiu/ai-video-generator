@@ -5,7 +5,10 @@ import { Welcome } from "./components/Welcome";
 import { Subtitles } from "./components/Subtitles";
 import { ImageSplit } from "./components/ImageSplit";
 import { SrtVideo } from "./components/SrtVideo";
-import { ModeSwitch, type Mode } from "./components/ModeSwitch";
+import { ImageToVideo } from "./components/ImageToVideo";
+import { ModeSwitch } from "./components/ModeSwitch";
+import { useRoute } from "./lib/route";
+import { Landing } from "./components/Landing";
 import { Toolbar } from "./components/Toolbar";
 import { TOOL_GROUPS, chooseTool } from "./lib/tools";
 import { Sidebar } from "./components/Sidebar";
@@ -22,7 +25,7 @@ export default function App() {
   const loading = useStore((s) => s.loading);
   const [signing, setSigning] = useState(false);
   const [dropping, setDropping] = useState(false);
-  const [mode, setMode] = useState<Mode>("pdf");
+  const { section, tab } = useRoute();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -105,8 +108,14 @@ export default function App() {
         </div>
       ) : (
         <>
-          <ModeSwitch mode={mode} onChange={setMode} />
-          {mode === "pdf" ? <Welcome /> : mode === "subtitles" ? <Subtitles /> : mode === "split" ? <ImageSplit /> : <SrtVideo />}
+          {section === "home" ? (
+            <Landing />
+          ) : (
+            <>
+              <ModeSwitch section={section} tab={tab} />
+              {section === "pdf" ? <Welcome /> : section === "montage" ? <ImageToVideo /> : tab === "split" ? <ImageSplit /> : tab === "video" ? <SrtVideo /> : <Subtitles />}
+            </>
+          )}
         </>
       )}
 
