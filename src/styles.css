@@ -1965,3 +1965,84 @@ body.mtg-dragging * {
   height: 18px;
   accent-color: var(--accent);
 }
+
+/* Split image: several images at once */
+.split-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.split-batch {
+  list-style: none;
+  margin: 0;
+  padding: 2px 2px 6px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+.split-batch li {
+  position: relative;
+  flex: 0 0 148px;
+}
+.split-batch li > button:first-child {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--hair);
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.split-batch li.on > button:first-child {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
+.split-batch img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--panel-2);
+  display: block;
+}
+.split-batch-name {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.split-batch-count {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.split-batch-count.none {
+  color: var(--danger);
+}
+.split-batch-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  background: color-mix(in oklab, var(--panel) 88%, transparent);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.split-current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: -10px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 560px) {
+  .split-batch li {
+    flex-basis: 120px;
+  }
+}
